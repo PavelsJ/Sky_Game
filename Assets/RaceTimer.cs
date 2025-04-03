@@ -8,6 +8,7 @@ public class RaceTimer : MonoBehaviour
 {
     private bool timerActive = false;
     private float timer;
+    private float finalTimer;
     
     public TextMeshProUGUI timerText;
 
@@ -43,6 +44,11 @@ public class RaceTimer : MonoBehaviour
     private void StopRaceTimer()
     {
         timerActive = false;
+        finalTimer = timer;
+
+        GameData.Instance.AddRace(finalTimer);
+        PlayerPrefs.SetFloat("Race Timer", finalTimer);
+        
         Debug.Log("Race Timer Stopped");
     }
 

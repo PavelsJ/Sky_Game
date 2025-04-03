@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class Flag : MonoBehaviour
 {
-    public Material material;
-
-    private void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            GetComponent<MeshRenderer>().material = material;
+            GetComponent<MeshRenderer>().material.color = Color.red;
             GameManager.CallPenalty();
         }
     }
+    
+    
 }

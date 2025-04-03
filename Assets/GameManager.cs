@@ -5,9 +5,10 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public delegate void RaceEvent();
-    
     public static event RaceEvent OnStartRace;
     public static event RaceEvent OnPenalty;
+
+    public static event RaceEvent OnBoost;
     public static event RaceEvent OnEndRace;
 
     public static void CallStartRace()
@@ -23,6 +24,14 @@ public class GameManager : MonoBehaviour
         if (OnPenalty != null)
         {
             OnPenalty();
+        }
+    }
+
+    public static void CallBoost()
+    {
+        if (OnBoost != null)
+        {
+            OnBoost();
         }
     }
 

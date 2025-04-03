@@ -25,6 +25,7 @@ public class TakeDamage : MonoBehaviour
         {
             rb.AddForce(Vector3.forward * stunForce, ForceMode.Impulse);
             rb.AddForce(Vector3.up * (stunForce / 2), ForceMode.Impulse);
+            
             isHurt = true;
 
             if (stunCoroutine != null)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,8 +13,24 @@ public class PlayerControlle : MonoBehaviour
     [SerializeField] private Transform groundTransform;
 
     private float speed = 0;
+    private bool boost = false;
+    
     private Rigidbody rb;
     private Animator animator;
+    private Coroutine boostCoroutine;
+    
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
+        
+        GameManager.OnBoost += Boost;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnBoost -= Boost;
+    }
 
     void Update()
     {
@@ -38,11 +55,7 @@ public class PlayerControlle : MonoBehaviour
 
     }
     // Start is called before the first frame update
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
-    }
+   
     private void FixedUpdate()
     {
         if(TakeDamage.isHurt) return;
@@ -51,11 +64,25 @@ public class PlayerControlle : MonoBehaviour
         acceleration = Remap(0, 90, maxAcceleration, minAcceleration, angle);
         speed += acceleration * Time.fixedDeltaTime;
         speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
-        animator.SetFloat("playerSpeed", speed);
-        Vector3 velocity = transform.forward * speed * Time.fixedDeltaTime;
+
+        if (!boost)
+        {
+            Move(speed);
+        }
+        else
+        {
+            Move(speed += maxSpeed);
+        }
+    }
+    
+    private void Move(float newSpeed)
+    {
+        animator.SetFloat("playerSpeed", newSpeed);
+        
+        Vector3 velocity = transform.forward * (newSpeed * Time.fixedDeltaTime);
         rb.velocity = new Vector3(velocity.x, rb.velocity.y, velocity.z);
     }
-
+    
     private float Remap(float oldMin, float oldMax, float newMin, float newMax, float oldValue)
     {
         float oldRange = (oldMax - oldMin);
@@ -64,6 +91,21 @@ public class PlayerControlle : MonoBehaviour
         return newValue;
     }
 
-    // Update is called once per frame
 
+    private void Boost()
+    {
+        if (boostCoroutine != null)
+        {
+            StopCoroutine(boostCoroutine);   
+        }
+        
+        boost = true;
+        boostCoroutine = StartCoroutine(BoostCoroutine());
+    }
+
+    private IEnumerator BoostCoroutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+        boost = false;
+    }
 }
