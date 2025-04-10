@@ -758,7 +758,7 @@ GameObject:
   - component: {fileID: 9117953069100586070}
   - component: {fileID: 4085612886327515353}
   - component: {fileID: 4246688608450195278}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: Snowman
   m_TagString: Untagged
   m_Icon: {fileID: 0}

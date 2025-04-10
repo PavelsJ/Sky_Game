@@ -5,36 +5,51 @@ using UnityEngine;
 public class SnowmanThrow : MonoBehaviour
 {
     public GameObject snowBall;
+    private GameObject snowBallClone;
+    private GameObject target;
+    
     public float throwDistance;
     public int throwSpeed;
     private bool justThown = false;
+    private Vector3 throwDirection = new Vector3(0, 0.33f);
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
+        snowBallClone = Instantiate(snowBall, transform.position, transform.rotation);
+        snowBallClone.SetActive(false);
         
+        target = GameObject.Find("Player");
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
-       GameObject target = GameObject.Find("Player");
-       
-       float distanceToTarget = Vector3.Distance(target.transform.position, transform.position);
-
-        if (distanceToTarget < throwDistance&&justThown==false)
+        if (Time.frameCount % 6 == 0)
         {
-            justThown = true;
-            GameObject tempSnowBall = Instantiate(snowBall,transform.position,transform.rotation);
-            Rigidbody tempRb = tempSnowBall.GetComponent<Rigidbody>();
-            Vector3 targetDirection =  Vector3.Normalize(target.transform.position-transform.position);
-            
-            //Add a small throw angle
-            targetDirection += new Vector3(0, 0.33f, 0);
-            tempRb.AddForce(targetDirection * throwSpeed);
-            Invoke("ThrowOver", 0.1f);
+            float distanceToTarget = Vector3.Distance(target.transform.position, transform.position);
+       
+            if (distanceToTarget < throwDistance 
+                && justThown == false 
+                && !snowBallClone.activeSelf)
+            {
+                ThrowSnowBall();
+            }
         }
+    }
 
+    private void ThrowSnowBall()
+    {
+        justThown = true;
+            
+        snowBallClone.transform.position = transform.position;
+        snowBallClone.SetActive(justThown);
+           
+        Rigidbody tempRb = snowBallClone.GetComponent<Rigidbody>();
+        Vector3 targetDirection =  Vector3.Normalize(target.transform.position-transform.position);
+                
+        targetDirection += throwDirection;
+        tempRb.AddForce(targetDirection * throwSpeed);
+            
+        Invoke("ThrowOver", 0.1f);
     }
 
     void ThrowOver()
