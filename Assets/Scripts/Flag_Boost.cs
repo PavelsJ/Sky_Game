@@ -4,7 +4,15 @@ using UnityEngine;
 
 public class Flag_Boost : Flag
 {
-    public GameObject[] flagBoosts;
+    private List<GameObject> flagBoosts = new List<GameObject>();
+
+    private void Start()
+    {
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            flagBoosts.Add(transform.GetChild(i).gameObject);
+        }
+    }
     protected override void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))

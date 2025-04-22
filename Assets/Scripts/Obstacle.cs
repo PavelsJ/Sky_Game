@@ -17,6 +17,7 @@ public class Obstacle : MonoBehaviour
    {
       OnHit();
    }
+   
 
    internal void OnHit()
    {

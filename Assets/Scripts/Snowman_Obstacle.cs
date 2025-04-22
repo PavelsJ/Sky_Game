@@ -7,6 +7,11 @@ public class Snowman_Obstacle : Obstacle
     protected override void PushBack()
     {
         OnHit();
-        Destroy(gameObject);
+        DestroyObstacle();
+    }
+
+    private void DestroyObstacle()
+    {
+        gameObject.SetActive(false);
     }
 }

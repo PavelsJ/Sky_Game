@@ -6,18 +6,35 @@ using UnityEngine.SceneManagement;
 
 public class PlayerControlle : MonoBehaviour
 {
-    [SerializeField] private KeyCode leftInput, rightInput;
-    [SerializeField] private float acceleration = 100, turnSpeed = 100,
-        minSpeed =0, maxSpeed = 500, minAcceleration= -100, maxAcceleration = 200;
+    [Header("Input")] 
+    [SerializeField] private KeyCode leftInput;
+    [SerializeField] private KeyCode rightInput;
+    
+    [Header("Movement")] 
+    [SerializeField] private float turnSpeed = 100;
+    [SerializeField] private float minSpeed = 0;
+    [SerializeField] private float maxSpeed = 500;
+    
+    [SerializeField] private float acceleration = 100;
+    [SerializeField] private float minAcceleration = -100;
+    [SerializeField] private float maxAcceleration = 200;
+    
+    private float speed = 0;
+    
+    [Header("Boost")]
+    [SerializeField] private float boostForce = 300f;
+    [SerializeField] private float boostDuration = 1.5f;
+    [SerializeField] private AnimationCurve boostCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
+    
+    private float boostSpeed = 0f;
+    private float boostTimer = 0f;
+    
+    [Header("Ground")]
     [SerializeField] private LayerMask groundLayers;
     [SerializeField] private Transform groundTransform;
-
-    private float speed = 0;
-    private bool boost = false;
     
     private Rigidbody rb;
     private Animator animator;
-    private Coroutine boostCoroutine;
     
     void Start()
     {
@@ -47,14 +64,7 @@ public class PlayerControlle : MonoBehaviour
                 transform.Rotate(new Vector3(0, -turnSpeed * Time.deltaTime, 0), Space.Self);
             }
         }
-        
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-
     }
-    // Start is called before the first frame update
    
     private void FixedUpdate()
     {
@@ -65,14 +75,19 @@ public class PlayerControlle : MonoBehaviour
         speed += acceleration * Time.fixedDeltaTime;
         speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
 
-        if (!boost)
+        if (boostTimer > 0f)
         {
-            Move(speed);
+            float curveValue = boostCurve.Evaluate(1f - (boostTimer / boostDuration));
+            boostSpeed = boostForce * curveValue;
+            boostTimer -= Time.fixedDeltaTime;
         }
         else
         {
-            Move(speed += maxSpeed);
+            boostSpeed = 0f;
         }
+        
+        float totalSpeed = speed + boostSpeed;
+        Move(totalSpeed);
     }
     
     private void Move(float newSpeed)
@@ -91,21 +106,8 @@ public class PlayerControlle : MonoBehaviour
         return newValue;
     }
 
-
     private void Boost()
     {
-        if (boostCoroutine != null)
-        {
-            StopCoroutine(boostCoroutine);   
-        }
-        
-        boost = true;
-        boostCoroutine = StartCoroutine(BoostCoroutine());
-    }
-
-    private IEnumerator BoostCoroutine()
-    {
-        yield return new WaitForSeconds(0.5f);
-        boost = false;
+        boostTimer = boostDuration;
     }
 }

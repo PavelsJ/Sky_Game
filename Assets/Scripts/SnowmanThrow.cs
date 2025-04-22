@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -44,6 +45,7 @@ public class SnowmanThrow : MonoBehaviour
         snowBallClone.SetActive(justThown);
            
         Rigidbody tempRb = snowBallClone.GetComponent<Rigidbody>();
+        tempRb.velocity = Vector3.zero;
         Vector3 targetDirection =  Vector3.Normalize(target.transform.position-transform.position);
                 
         targetDirection += throwDirection;

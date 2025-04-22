@@ -4,21 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameData : MonoBehaviour
 {
     private static GameData instance;
-
+    
     public Transform leaderBoard;
-    
-    public int raceCount;
-    public int maxRaces = 5;
-    
     public GameObject racePrefab;
-    private List<GameObject> races = new List<GameObject>();
-    private List<float> racesTimes = new List<float>();
+    private const int maxRaces = 5;
 
-   
+    private List<float> raceTimes = new List<float>();
+    private string SceneKeyPrefix => SceneManager.GetActiveScene().name;
+    
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -39,52 +37,77 @@ public class GameData : MonoBehaviour
     
     private void Start()
     {
-        for (int i = 0; i < maxRaces ; i++)
-        {
-            if (PlayerPrefs.HasKey("Race_" + i))
-            {
-                GameObject race = Instantiate(racePrefab, leaderBoard.transform);
-                float score = PlayerPrefs.GetFloat("Race_" + i);
-                race.GetComponentInChildren<TextMeshProUGUI>().text = score.ToString();
-                races.Add(race);
-            }
-        }
+        LoadScores();
+        UpdateLeaderboardUI();
     }
 
-
-    public void AddRace(float score)
+    public void AddRace(float newScore)
     {
-        racesTimes.Clear();
-        
-        if (raceCount < maxRaces)
+        LoadScores();
+
+        if (raceTimes.Count < maxRaces)
         {
-            GameObject race = Instantiate(racePrefab, leaderBoard.transform);
-            race.GetComponentInChildren<TextMeshProUGUI>().text = score.ToString();
-            races.Add(race);
-            
-            PlayerPrefs.SetFloat("Race_" + races.Count + 1, score);
+            raceTimes.Add(newScore);
         }
         else
         {
-            for (int i = 0; i < maxRaces; i++)
+            float maxScore = raceTimes.Max();
+            if (newScore < maxScore)
             {
-                if (PlayerPrefs.HasKey("Race_" + i))
-                {
-                    float thisScore = PlayerPrefs.GetFloat("Race_" + i);
-                    racesTimes.Add(thisScore);
-
-                    float lowestScore = racesTimes.Max();
-                    
-                    if (score > lowestScore)
-                    {
-                        races[i].GetComponentInChildren<TextMeshProUGUI>().text = score.ToString();
-                        
-                        PlayerPrefs.SetFloat("Race_" + i, score);
-                        PlayerPrefs.Save();
-                        return;
-                    }
-                }
+                int maxIndex = raceTimes.IndexOf(maxScore);
+                raceTimes[maxIndex] = newScore;
             }
         }
+
+        raceTimes = raceTimes.OrderBy(s => s).ToList();
+
+        SaveScores();
+        UpdateLeaderboardUI();
+    }
+
+    private void LoadScores()
+    {
+        raceTimes.Clear();
+        for (int i = 0; i < maxRaces; i++)
+        {
+            string key = $"{SceneKeyPrefix}_Race_{i}";
+            if (PlayerPrefs.HasKey(key))
+            {
+                raceTimes.Add(PlayerPrefs.GetFloat(key));
+            }
+        }
+        raceTimes = raceTimes.OrderBy(s => s).ToList();
+    }
+
+    private void SaveScores()
+    {
+        for (int i = 0; i < maxRaces; i++)
+        {
+            string key = $"{SceneKeyPrefix}_Race_{i}";
+            if (i < raceTimes.Count)
+                PlayerPrefs.SetFloat(key, raceTimes[i]);
+            else
+                PlayerPrefs.DeleteKey(key);
+        }
+        PlayerPrefs.Save();
+    }
+
+    private void UpdateLeaderboardUI()
+    {
+        foreach (Transform child in leaderBoard)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (float score in raceTimes)
+        {
+            GameObject entry = Instantiate(racePrefab, leaderBoard);
+            entry.GetComponentInChildren<TextMeshProUGUI>().text = score.ToString("F2");
+        }
+    }
+    
+    public List<float> GetRaceTimes()
+    {
+        return new List<float>(raceTimes);
     }
 }

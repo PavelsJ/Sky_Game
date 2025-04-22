@@ -3978,12 +3978,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftInput: 97
   rightInput: 100
-  acceleration: 100
   turnSpeed: 100
   minSpeed: 0
   maxSpeed: 500
+  acceleration: 100
   minAcceleration: -100
   maxAcceleration: 200
+  boostForce: 400
+  boostDuration: 1
+  boostCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: -0.0025939941
+      inSlope: 5.6244597
+      outSlope: 5.6244597
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.039469697
+    - serializedVersion: 3
+      time: 0.9999812
+      value: -0.0000017210841
+      inSlope: -1.9689289
+      outSlope: -1.9689289
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.18602471
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   groundLayers:
     serializedVersion: 2
     m_Bits: 64
@@ -4000,8 +4026,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62f47a142e420ab4895079e6e66b5b89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stunDuration: 1
   stunForce: 10
+  stunDuration: 1
 --- !u!1 &4335157639809742679
 GameObject:
   m_ObjectHideFlags: 0

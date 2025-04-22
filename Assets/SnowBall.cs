@@ -19,6 +19,6 @@ public class SnowBall : MonoBehaviour
     private IEnumerator Delay()
     {
         yield return new WaitForSeconds(2f);
-        gameObject.SetActive(true);
+        gameObject.SetActive(false);
     }
 }

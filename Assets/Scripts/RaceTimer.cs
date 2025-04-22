@@ -33,6 +33,11 @@ public class RaceTimer : MonoBehaviour
             timer += Time.deltaTime;
             UpdateTimer();
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            PlayerPrefs.DeleteAll();
+        }
     }
 
     private void StartRaceTimer()
@@ -47,8 +52,6 @@ public class RaceTimer : MonoBehaviour
         finalTimer = timer;
 
         GameData.Instance.AddRace(finalTimer);
-        PlayerPrefs.SetFloat("Race Timer", finalTimer);
-        
         Debug.Log("Race Timer Stopped");
     }
 
@@ -60,5 +63,24 @@ public class RaceTimer : MonoBehaviour
     private void UpdateTimer()
     {
         timerText.text = timer.ToString("0.00");
+        
+        List<float> raceTimes = GameData.Instance.GetRaceTimes();
+        if (raceTimes.Count == 0) return;
+
+        float best = raceTimes[0]; 
+        float worst = raceTimes[^1]; 
+
+        if (timer < best)
+        {
+            timerText.color = Color.green;
+        }
+        else if (timer > worst)
+        {
+            timerText.color = Color.red;
+        }
+        else
+        {
+            timerText.color = Color.yellow;
+        }
     }
 }
